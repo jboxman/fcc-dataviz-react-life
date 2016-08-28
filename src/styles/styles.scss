@@ -1,0 +1,53 @@
+/*
+ Based upon SCSS approach used in
+ http://codepen.io/aut0poietic/pen/IxEsi
+*/
+
+$size: 10;
+$sm-max: 49;
+$md-max: 74;
+$lg-max: 99;
+
+#container {
+  position: relative;
+  margin: auto;
+  border: solid 1px blue;
+}
+.tile {
+  position: absolute;
+  width: $size - 1px;
+  height: $size - 1px;
+  border: solid 1px red;
+}
+.alive {
+  background: green;
+}
+
+.sm-grid {
+  position: absolute;
+  width: ($size * $sm-max) + 5px;
+  height: ($size * $sm-max) + 5px;
+}
+.md-grid {
+  position: absolute;
+  width: ($size * $md-max) + 5px;
+  height: ($size * $md-max) + 5px;
+}
+.lg-grid {
+  position: absolute;
+  width: ($size * $lg-max) + 5px;
+  height: ($size * $lg-max) + 5px;
+}
+
+@for $i from 0 through $lg-max {
+  [data-col="#{$i}"]  { left: $size * $i * 1px; }
+}
+@for $i from 0 through $lg-max {
+  [data-row="#{$i}"]  { top: $size * $i * 1px; }
+}
+
+footer {
+  border-top: 1px #ECECEC solid;
+  margin: 1em;
+  padding: 0.5em;
+}
