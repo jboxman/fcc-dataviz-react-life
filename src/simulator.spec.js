@@ -16,6 +16,8 @@ describe('Simulator', () => {
     expect(grid.reduce((p, n) => p + n.length, 0)).equal(16);
   });
 
+  // Add test for empty
+
   it('should follow the simulator ruleset', () => {
     const ALIVE = 1;
     const DEAD = 0;
@@ -34,8 +36,10 @@ describe('Simulator', () => {
 
     expect(actual).equals(expected);
   });
+
   // Try
   // https://www.math.cornell.edu/~lipa/mec/lesson6.html
+
   it('should run a tick', () => {
     const grid = [
       [0, 1, 1, 0],

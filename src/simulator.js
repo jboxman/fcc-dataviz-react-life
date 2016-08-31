@@ -10,13 +10,15 @@ const offsets = [
 ];
 
 export function createGrid(
-  {width = width, height = height} = {width: 4, height: 4}) {
+  {width = width,
+    height = height,
+    empty = empty} = {width: 4, height: 4, empty: false}) {
 
   const grid = [];
   for(let h = 0; h < height; h++) {
     grid.push([]);
     for(let w = 0; w < width; w++) {
-      grid[h][w] = Math.floor(Math.random() * 2);
+      grid[h][w] = empty ? 0 : Math.floor(Math.random() * 2);
     }
   }
   return grid;

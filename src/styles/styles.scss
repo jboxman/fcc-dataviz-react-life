@@ -4,20 +4,34 @@
 */
 
 $size: 10;
-$sm-max: 49;
-$md-max: 74;
-$lg-max: 99;
+$sm-max: 14;
+$md-max: 29;
+$lg-max: 44;
+
+#control-group {
+  width: 80%;
+  margin: 5px auto;
+  text-align: center;
+}
+.settings {
+  display: inline;
+  text-align: center;
+}
+.settings div {
+  margin: 10px;
+}
 
 #container {
   position: relative;
   margin: auto;
-  border: solid 1px blue;
+  border: solid 1px rgb(128, 128, 128);
 }
 .tile {
   position: absolute;
   width: $size - 1px;
   height: $size - 1px;
-  border: solid 1px red;
+  border: solid 1px rgb(211, 211, 211);
+  border-radius: 5px 5px 5px 5px;
 }
 .alive {
   background: green;
@@ -25,18 +39,18 @@ $lg-max: 99;
 
 .sm-grid {
   position: absolute;
-  width: ($size * $sm-max) + 5px;
-  height: ($size * $sm-max) + 5px;
+  width: ($size * $sm-max) + 1px;
+  height: ($size * $sm-max) + 1px;
 }
 .md-grid {
   position: absolute;
-  width: ($size * $md-max) + 5px;
-  height: ($size * $md-max) + 5px;
+  width: ($size * $md-max) + 1px;
+  height: ($size * $md-max) + 1px;
 }
 .lg-grid {
   position: absolute;
-  width: ($size * $lg-max) + 5px;
-  height: ($size * $lg-max) + 5px;
+  width: ($size * $lg-max) + 1px;
+  height: ($size * $lg-max) + 1px;
 }
 
 @for $i from 0 through $lg-max {

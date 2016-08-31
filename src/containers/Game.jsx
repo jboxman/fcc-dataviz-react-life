@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import classNames from 'classnames';
 
 import Sandbox from '../components/Sandbox';
+import Button from '../components/Button';
 import {createGrid, nextTick} from '../simulator';
 
 // TODO - somewhere x & y are flipped
@@ -11,9 +12,9 @@ const SPEED_NORMAL = 500;
 const SPEED_FAST = 250;
 
 const GRID_SIZE = {
-  sm: {width: 49, height: 49},
-  md: {width: 74, height: 74},
-  lg: {width: 99, height: 99}
+  sm: {width: 14, height: 14},
+  md: {width: 29, height: 29},
+  lg: {width: 44, height: 44}
 }
 
 class Game extends React.Component {
@@ -22,49 +23,79 @@ class Game extends React.Component {
 
     this.delay = 100;
     this.timerID = null;
+    this.running = false;
 
-    this.state = {
-      grid: createGrid(GRID_SIZE[props.gridSize]),
-      gridSize: props.gridSize,
-      count: 0,
-      running: false
-    };
+    this.state = this.resetState({gridSize: props.gridSize});
 
+    this.resetState = this.resetState.bind(this);
     this.run = this.run.bind(this);
     this.stop = this.stop.bind(this);
+
+    this.startHandler = this.startHandler.bind(this);
+    this.stopHandler = this.stopHandler.bind(this);
+    this.clearHandler = this.clearHandler.bind(this);
+
   }
 
-  run() {
-    if(this.state.count > 10)
-      return;
+  resetState(options = {}) {
+    const {empty} = options;
 
-    if(!this.state.running)
+    // gridSize is initially a prop, but may be changed later
+    // by user input.
+    const gridSize = options['gridSize'] ? options.gridSize : this.state.gridSize;
+
+    // Pass through argument for empty grid
+    const gridOptions = Object.assign({},
+      {empty}, GRID_SIZE[gridSize]);
+
+    const grid = createGrid(gridOptions);
+
+    return {
+      grid: grid,
+      gridSize: gridSize,
+      count: 0
+    }
+  }
+
+  run({coldstart} = {coldstart: false}) {
+    //if(this.state.count > 10)
+    //  return;
+
+    if(!this.running && !coldstart)
       return;
 
     const {grid} = nextTick(this.state.grid);
+
     this.setState({
       grid,
-      running: true,
       count: (this.state.count + 1)
+    },
+    function() {
+      this.running = true;
+      this.timerID = setTimeout(this.run, this.delay);
     });
-    this.timerID = setTimeout(this.run, this.delay);
   }
 
   stop() {
     window.clearTimeout(this.timerID);
     this.timerID = null;
-    this.setState({
-      running: false,
-      count: 0
-    });
+    this.running = false;
   }
 
+  // Run as soon as component is ready
   componentDidMount() {
-    this.run();
+    this.run({coldstart: true});
   }
 
   startHandler() {
-    this.run();
+    if(!this.running) {
+      this.setState(
+        this.resetState({empty: false}),
+        function() {
+          this.run({coldstart: true});
+      });
+      //console.log(`start count: ${this.state.count}`);
+    }
   }
 
   stopHandler() {
@@ -72,10 +103,28 @@ class Game extends React.Component {
   }
 
   clearHandler() {
+    this.stop();
+    this.setState(this.resetState({empty: true}));
+  }
 
+  // Bound in render() which has performance implications.
+  speedHandler(v) {
+    this.delay = v;
+  }
+
+  // Resize and restart. Bound in render() has performance implications.
+  sizeHandler(v) {
+    this.stop();
+    console.log(v);
+    this.setState(
+      this.resetState({gridSize: v}),
+      function() {
+        this.run({coldstart: true});
+    });
   }
 
   render() {
+    // The grid class depends upon the grid width and height
     const classes = classNames({
       'sm-grid': this.state.gridSize == 'sm',
       'md-grid': this.state.gridSize == 'md',
@@ -83,8 +132,32 @@ class Game extends React.Component {
     });
 
     return(
-      <div id="container" className={classes}>
-        <Sandbox grid={this.state.grid} classes={classes} />
+      <div>
+        <div id="control-group">
+          <div className="text-center">
+            <span className="label label-default">Controls</span>
+            <Button label={'Start'} clickAction={this.startHandler} />
+            <Button label={'Stop'} clickAction={this.stopHandler} />
+            <Button label={'Clear'} clickAction={this.clearHandler} />
+          </div>
+        </div>
+
+        <div id="container" className={classes}>
+          <Sandbox grid={this.state.grid} classes={classes} />
+        </div>
+
+        <div className="settings">
+          <div>
+            <span className="label label-default">Speed</span>
+            <Button label={'Fast'} clickAction={this.speedHandler.bind(this, SPEED_FAST)} />
+            <Button label={'Normal'} clickAction={this.speedHandler.bind(this, SPEED_NORMAL)} />
+            <Button label={'Slow'} clickAction={this.speedHandler.bind(this, SPEED_SLOW)} />
+            <span className="label label-default">Size</span>
+            <Button label={'Small'} clickAction={this.sizeHandler.bind(this, 'sm')} />
+            <Button label={'Medium'} clickAction={this.sizeHandler.bind(this, 'md')} />
+            <Button label={'Large'} clickAction={this.sizeHandler.bind(this, 'lg')} />
+          </div>
+        </div>
       </div>
     );
   }
